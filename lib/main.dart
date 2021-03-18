@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_downloader/image_downloader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +55,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 ElevatedButton(
                   child: Text('Load Image'),
-                  onPressed: () {},
+                  onPressed: loadImage,
                 )
               ],
             )
@@ -85,6 +86,20 @@ class _MyAppState extends State<MyApp> {
         _url = url;
       });
       print('url $url');
+    } catch (ex) {
+      print(ex.message);
+    }
+  }
+
+  void loadImage() async {
+    try {
+      var imageId = await ImageDownloader.downloadImage(_url);
+      var path = await ImageDownloader.findPath(imageId);
+      File image = File(path);
+      print('done');
+      setState(() {
+        _image = image;
+      });
     } catch (ex) {
       print(ex.message);
     }

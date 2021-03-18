@@ -31,6 +31,7 @@ dependencies:
   # Image
   image_picker: ^0.7.3
   path: ^1.8.0
+  image_downloader: ^0.30.0
   # Firebase
   firebase_core: ^1.0.1
   firebase_storage: ^8.0.0
