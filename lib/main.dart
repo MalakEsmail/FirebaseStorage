@@ -1,9 +1,13 @@
 import 'dart:io';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -15,6 +19,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   File _image;
+  String _url;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,7 +45,9 @@ class _MyAppState extends State<MyApp> {
               children: [
                 ElevatedButton(
                   child: Text('Upload Image'),
-                  onPressed: () {},
+                  onPressed: () {
+                    uploadImage();
+                  },
                 ),
                 SizedBox(
                   width: 10,
@@ -62,5 +69,24 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _image = File(image.path);
     });
+  }
+
+  void uploadImage() async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instanceFor(
+          bucket: 'gs://e-commerce-3aa37.appspot.com');
+      Reference ref = storage.ref().child(p.basename(_image.path));
+      UploadTask task = ref.putFile(_image);
+      TaskSnapshot snapshot = await task.whenComplete(() => null);
+      print('success');
+      String url = await snapshot.ref.getDownloadURL();
+
+      setState(() {
+        _url = url;
+      });
+      print('url $url');
+    } catch (ex) {
+      print(ex.message);
+    }
   }
 }
